@@ -8,21 +8,51 @@ on:
         branches:
             - main
 
+
 jobs:
-    build:
+    test:
         runs-on: ubuntu-latest
 
         steps:
-        - name: Checkout code
-            uses: actions/checkout@v2
+            - name: Chekout code
+                uses: actions/checkout@v3
 
-        - name: Set up Node.js
-            uses: actions/setup-node@v2
-            with:
-                node-version: '14'
+            - name: Set up Node.js
+                uses: action/setup-node@v3
+                with:
+                    node-version: '18'
 
-        - name: Install dependencies
-            run: npm install
+            - name: Install backend dependencies
+                run: cd backend && npm test
+                env: 
+                    MONGO_URI: ${{secrest.MONGO_URI}}
+                    JWT_SECRET: ${{secrets/JWT_SECRET}}
+                    PORT: 5001
 
-        - name: Run tests
-            run: npm test
+        
+
+
+    deploy:
+        needs: test
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+
+
+        steps:
+            - name: Checkout code
+                uses: actions/checkout@v3
+
+            - name: Deploy to EC2
+                uses: appleboy/ssh-action@0.1.10
+                with:
+                    host: ${{secrets.EC2-HOST}}
+                    username: ubuntu
+                    key: ${{secrets.EC2_SSH_KEY}}
+                    script: |
+                        cd ~/app
+                        git pull origin main
+                        cd backend && npm install
+                        pm2 restart backend
+
+
+    
