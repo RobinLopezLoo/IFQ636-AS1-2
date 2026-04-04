@@ -1,58 +1,58 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
-
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Chekout code
-                uses: actions/checkout@v3
-
-            - name: Set up Node.js
-                uses: action/setup-node@v3
-                with:
-                    node-version: '18'
-
-            - name: Install backend dependencies
-                run: cd backend && npm test
-                env: 
-                    MONGO_URI: ${{secrest.MONGO_URI}}
-                    JWT_SECRET: ${{secrets/JWT_SECRET}}
-                    PORT: 5001
-
-        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
 
-    deploy:
-        needs: test
-        runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
 
-        steps:
-            - name: Checkout code
-                uses: actions/checkout@v3
-
-            - name: Deploy to EC2
-                uses: appleboy/ssh-action@0.1.10
-                with:
-                    host: ${{secrets.EC2-HOST}}
-                    username: ubuntu
-                    key: ${{secrets.EC2_SSH_KEY}}
-                    script: |
-                        cd ~/app
-                        git pull origin main
-                        cd backend && npm install
-                        pm2 restart backend
+      - name: Install backend dependencies
+        run: cd backend && npm install
 
 
-    
+      - name: Run backend tests
+        run: cd backend && npm test
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: 5001
+
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/app
+            git pull origin main
+            cd backend && npm install
+            pm2 restart backend
