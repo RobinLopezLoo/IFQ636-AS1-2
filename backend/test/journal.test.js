@@ -16,6 +16,7 @@ describe('Journal API', () => {
     if (res.status === 401 || res.status === 403) return;
     throw new Error('Expected 401 or 403');
   });
+  
 
   it('should return 401 when deleting journal without token', async () => {
     const res = await request(app)
@@ -23,5 +24,6 @@ describe('Journal API', () => {
     if (res.status === 401 || res.status === 403) return;
     throw new Error('Expected 401 or 403');
   });
+
 
 });
