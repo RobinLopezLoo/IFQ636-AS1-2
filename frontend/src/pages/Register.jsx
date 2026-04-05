@@ -3,49 +3,96 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     try {
-      await axiosInstance.post('/api/auth/register', formData);
-      alert('Registration successful. Please log in.');
+      await axiosInstance.post('/api/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
       navigate('/login');
     } catch (error) {
-      alert('Registration failed. Please try again.');
+      setError('Registration failed. Please try again.');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
-        <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
-        <input
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        />
-        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">
-          Register
-        </button>
-      </form>
+    <div style={{ minHeight: '100vh', background: '#1a3a5c', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
+
+      {/* Title */}
+      <div style={{ background: '#2a6ade', padding: '12px 40px', borderRadius: '30px', marginBottom: '40px' }}>
+        <span style={{ color: 'white', fontSize: '40px', fontWeight: 'bold', fontFamily: "'Dancing Script', cursive" }}>Travel Logger</span>
+      </div>
+
+      {/* Register Box */}
+      <div style={{ background: '#6b7a8d', padding: '40px', borderRadius: '20px', width: '350px' }}>
+        <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '24px', fontSize: '22px', fontWeight: 'bold' }}>
+          Register an account with Travel Logger
+        </h2>
+
+        {error && <div style={{ color: '#ffcccc', marginBottom: '12px', textAlign: 'center' }}>{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ color: 'white', fontSize: '14px' }}>Full Name:</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: 'none', marginTop: '4px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ color: 'white', fontSize: '14px' }}>Email Address:</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: 'none', marginTop: '4px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ color: 'white', fontSize: '14px' }}>Password:</label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: 'none', marginTop: '4px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ color: 'white', fontSize: '14px' }}>Confirm Password:</label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: 'none', marginTop: '4px', boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <button type="submit"
+            style={{ width: '100%', padding: '12px', background: '#c87941', color: 'white', border: 'none', borderRadius: '30px', fontSize: '18px', cursor: 'pointer', marginBottom: '12px' }}>
+            Create
+          </button>
+
+          <button type="button" onClick={() => navigate('/login')}
+            style={{ width: '100%', padding: '10px', background: '#4a5568', color: 'white', border: 'none', borderRadius: '30px', fontSize: '14px', cursor: 'pointer' }}>
+            Back to Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

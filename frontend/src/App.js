@@ -5,6 +5,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Journals from './pages/Journals';
 import JournalForm from './pages/JournalForm';
+import JournalView from './pages/JournalView';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/journals" element={<Journals/>}/>
         <Route path="/journals/new" element={<JournalForm/>}/>
         <Route path="/journals/edit/:id" element={<JournalForm/>}/>
+        <Route path= "journals/view/:id" element={<JournalView/>}/>
         
       </Routes>
     </Router>
